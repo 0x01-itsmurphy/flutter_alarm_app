@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_state.dart';
 import 'package:flutter_alarm_app/service/alarm_scheduler.dart';
-import 'package:flutter_audio_manager/flutter_audio_manager.dart';
+import 'package:flutter_audio_output/flutter_audio_output.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -45,13 +45,13 @@ class _AlarmSecondScreenState extends State<AlarmSecondScreen>
       print("An error occured $error");
     });
     _audioPlayer.play();
-    FlutterAudioManager.changeToReceiver();
+    FlutterAudioOutput.changeToReceiver();
     init();
     super.initState();
   }
 
   Future<void> init() async {
-    FlutterAudioManager.setListener(() async {
+    FlutterAudioOutput.setListener(() async {
       print("-----changed-------");
 
       await _getInput();
@@ -64,10 +64,10 @@ class _AlarmSecondScreenState extends State<AlarmSecondScreen>
   }
 
   _getInput() async {
-    _currentInput = await FlutterAudioManager.getCurrentOutput();
+    _currentInput = await FlutterAudioOutput.getCurrentOutput();
     print("current input :$_currentInput");
 
-    _availableInputs = await FlutterAudioManager.getAvailableInputs();
+    _availableInputs = await FlutterAudioOutput.getAvailableInputs();
     print("available inputs  $_availableInputs");
   }
 
@@ -214,14 +214,14 @@ class _AlarmSecondScreenState extends State<AlarmSecondScreen>
                           await _getInput();
                           if (_currentInput.port == AudioPort.speaker) {
                             isSpeaker =
-                                await FlutterAudioManager.changeToReceiver();
+                                await FlutterAudioOutput.changeToReceiver();
                             setState(() {
                               isSpeaker = false;
                             });
                             print("change to Receiver :$isSpeaker");
                           } else {
                             isSpeaker =
-                                await FlutterAudioManager.changeToSpeaker();
+                                await FlutterAudioOutput.changeToSpeaker();
                             setState(() {
                               isSpeaker = true;
                             });

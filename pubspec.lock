@@ -218,13 +218,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_audio_manager:
-    dependency: "direct dev"
+  flutter_audio_output:
+    dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
-    version: "0.2.3"
+      name: flutter_audio_output
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -333,6 +333,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   logging:
     dependency: transitive
     description:

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
@@ -13,8 +14,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock/wakelock.dart';
-
-import 'package:flutter_audio_manager/flutter_audio_manager.dart';
+import 'package:logger/logger.dart';
+import 'package:flutter_audio_output/flutter_audio_output.dart';
 
 class AlarmScreen extends StatefulWidget {
   const AlarmScreen({Key? key, required this.alarm}) : super(key: key);
@@ -26,30 +27,39 @@ class AlarmScreen extends StatefulWidget {
 }
 
 class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
+  final logger = Logger(
+      printer: PrettyPrinter(
+    methodCount: 0,
+    errorMethodCount: 5,
+    lineLength: 50,
+    colors: true,
+    printEmojis: true,
+    printTime: true,
+  ));
   late AudioPlayer _audioPlayer;
   final audioPlayer = AudioPlayer();
 
   late Timer timer;
-  int timerCounter = 0;
+  int responseCounter = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    print("TTTTTTTTTTTTTTTTMMMMMMMMMMMMMMMMMM  $timerCounter");
+    logger.w("TTTTTTTTTTTTTTTTMMMMMMMMMMMMMMMMMM  $responseCounter");
 
-    if (timerCounter > 2) {
-      _dismissAlarm();
-    } else {
-      timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
-        timer = t;
-        _fiveMinutesAlarm();
-        SystemNavigator.pop();
-        debugPrint("Music Playing Again after 5 minutes");
-        debugPrint("Timer Tic ${timer.tick}");
-      });
-    }
+    // if (timerCounter > 2) {
+    //   _dismissAlarm();
+    // } else {
+    timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
+      timer = t;
+      _fiveMinutesAlarm();
+      SystemNavigator.pop();
+      logger.d("Music Playing Again after 5 minutes");
+      logger.d("Timer Tic ${timer.tick}");
+    });
+    // }
 
     // ------------------ MUSIC PLAYER --------------- //
     _audioPlayer = AudioPlayer();
@@ -60,34 +70,18 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
       ),
     )
         .catchError((error) {
-      // catch load errors: 404, invalid url ...
-      print("An error occured $error");
+      logger.e("An error occured $error");
     });
     _audioPlayer.play();
-    // FlutterAudioManager.changeToReceiver();
-    FlutterAudioManager.changeToSpeaker();
-  }
-
-  void playAfterDuration() {
-    _audioPlayer = AudioPlayer();
-
-    _audioPlayer
-        .setAudioSource(
-      AudioSource.uri(
-        Uri.parse("asset:///assets/Sunflower.mp3"),
-      ),
-    )
-        .catchError((error) {
-      print("An error occured $error");
-    });
-    _audioPlayer.play();
+    FlutterAudioOutput.changeToSpeaker();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        _dismissAlarm();
+        // _dismissAlarm();
+        _fifteenMinShot();
         _fiveMinutesAlarm();
         break;
 
@@ -111,13 +105,9 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
   void _fiveMinutesAlarm() async {
     final alarmState = context.read<AlarmState>();
     final callbackAlarmId = alarmState.callbackAlarmId!;
-    // The alarm callback ID is added by the 'AlarmScheduler' as equal to the number of days (0), months (1), Tuesdays (2), ... and Saturdays (6).
-    // Therefore, the quotient divided by 7 represents the day of the week.
     final firedAlarmWeekday = callbackAlarmId % 7;
     final nextAlarmTime =
         widget.alarm.timeOfDay.toComingDateTimeAt(firedAlarmWeekday);
-
-    // await AlarmScheduler.reschedule(callbackAlarmId, nextAlarmTime);
     await AlarmScheduler.rescheduleFiveMinutes(callbackAlarmId, nextAlarmTime);
     timer.cancel();
     alarmState.dismiss();
@@ -128,8 +118,17 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
   void _dismissAlarm() async {
     final alarmState = context.read<AlarmState>();
     final callbackAlarmId = alarmState.callbackAlarmId!;
-    // // The alarm callback ID is added by the 'AlarmScheduler' as equal to the number of days (0), months (1), Tuesdays (2), ... and Saturdays (6).
-    // // Therefore, the quotient divided by 7 represents the day of the week.
+    await AndroidAlarmManager.cancel(callbackAlarmId);
+    timer.cancel();
+    alarmState.dismiss();
+    _audioPlayer.stop();
+    Wakelock.disable();
+  }
+
+  void _fifteenMinShot() async {
+    final alarmState = context.read<AlarmState>();
+    final callbackAlarmId = alarmState.callbackAlarmId!;
+
     final firedAlarmWeekday = callbackAlarmId % 7;
     final nextAlarmTime =
         widget.alarm.timeOfDay.toComingDateTimeAt(firedAlarmWeekday);
@@ -217,13 +216,23 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                     children: [
                       //* IF CALL REJECTED
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
                           //! EXIT FROM APP
-                          SystemNavigator.pop();
-                          timer.cancel();
-                          timer.cancel;
-                          timerCounter + 1;
-                          _dismissAlarm();
+                          if (responseCounter >= 2) {
+                            _dismissAlarm();
+                            SystemNavigator.pop();
+                            logger.w('2ND TIME COUNTER');
+                          } else {
+                            _fifteenMinShot();
+                            SystemNavigator.pop();
+                            timer.cancel();
+                            timer.cancel;
+                            logger.w('15 MIN. CONDITION CHECK');
+                          }
+                          setState(() {
+                            responseCounter + 1;
+                          });
+                          logger.e(responseCounter);
                         },
                         child: Container(
                           width: 60,
@@ -242,22 +251,21 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                       //* IF CALL ACCEPTED
                       InkWell(
                         onTap: () async {
-                          //! NAVIGATE TO SECOND SCREEN
-                          timer.cancel();
-                          timer.cancel;
-                          print(timer);
-                          print(timer.isActive);
-                          print(timer.tick);
-                          setState(() {
-                            timerCounter + 1;
-                          });
-                          // _dismissAlarm();
-                          Navigator.pushAndRemoveUntil(context,
-                              MaterialPageRoute(builder: (context) {
-                            return AlarmSecondScreen(
-                              alarm: widget.alarm,
-                            );
-                          }), (Route route) => false);
+                          // //! NAVIGATE TO SECOND SCREEN
+                          // timer.cancel();
+                          // timer.cancel;
+                          // print(timer);
+                          // print(timer.isActive);
+                          // print(timer.tick);
+                          // setState(() {
+                          //   timerCounter + 1;
+                          // });
+                          // Navigator.pushAndRemoveUntil(context,
+                          //     MaterialPageRoute(builder: (context) {
+                          //   return AlarmSecondScreen(
+                          //     alarm: widget.alarm,
+                          //   );
+                          // }), (Route route) => false);
                         },
                         child: Container(
                           width: 60,
