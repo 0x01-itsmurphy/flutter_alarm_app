@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_list_provider.dart';
 import 'package:flutter_alarm_app/provider/permission_provider.dart';
+import 'package:flutter_alarm_app/provider/response_counter.dart';
 import 'package:flutter_alarm_app/service/alarm_file_handler.dart';
 import 'package:flutter_alarm_app/service/alarm_polling_worker.dart';
 import 'package:flutter_alarm_app/provider/alarm_state.dart';
@@ -33,6 +34,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => AlarmListProvider(alarms)),
       ChangeNotifierProvider(
           create: (create) => PermissionProvider(preference)),
+      ChangeNotifierProvider(create: (create) => ResponseCounter()),
     ],
     child: const MyApp(),
   ));
