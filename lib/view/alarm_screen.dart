@@ -67,6 +67,14 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     });
   }
 
+  void _getCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      int? value = prefs.getInt('counter');
+      logger.e(value);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +83,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     logger.w("TTTTTTTTTTTTTTTTMMMMMMMMMMMMMMMMMM  $_responseCounter");
     // logger.e(Provider.of<ResponseCounter>(context, listen: false).counter);
     loadCounter();
+    _getCounter();
 
     // if (timerCounter > 2) {
     //   _dismissAlarm();
@@ -83,8 +92,10 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
       timer = t;
       _fiveMinutesAlarm();
       SystemNavigator.pop();
-      logger.d("Music Playing Again after 5 minutes");
-      logger.d("Timer Tic ${timer.tick}");
+      logger.w("Music Playing Again after 5 minutes");
+      logger.w("Timer Tic ${timer.tick}");
+      _clearCounter();
+      _getCounter();
     });
     // }
 
@@ -101,6 +112,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     });
     _audioPlayer.play();
     FlutterAudioOutput.changeToSpeaker();
+    _getCounter();
   }
 
   @override
@@ -137,6 +149,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
         widget.alarm.timeOfDay.toComingDateTimeAt(firedAlarmWeekday);
     await AlarmScheduler.rescheduleFiveMinutes(callbackAlarmId, nextAlarmTime);
     timer.cancel();
+    _clearCounter();
     alarmState.dismiss();
     _audioPlayer.stop();
     Wakelock.disable();
@@ -284,14 +297,30 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                       InkWell(
                         onTap: () async {
                           // //! NAVIGATE TO SECOND SCREEN
-                          // timer.cancel();
-                          // timer.cancel;
-                          // print(timer);
-                          // print(timer.isActive);
-                          // print(timer.tick);
-                          // setState(() {
-                          //   timerCounter + 1;
-                          // });
+                          if (_responseCounter >= 2) {
+                            _dismissAlarm();
+                            Navigator.pushAndRemoveUntil(context,
+                                MaterialPageRoute(builder: (context) {
+                              return AlarmSecondScreen(
+                                alarm: widget.alarm,
+                              );
+                            }), (Route route) => false);
+                            logger.w('2nd TIME Accecpted COUNTER');
+                            _clearCounter();
+                          } else {
+                            _fifteenMinShot();
+                            Navigator.pushAndRemoveUntil(context,
+                                MaterialPageRoute(builder: (context) {
+                              return AlarmSecondScreen(
+                                alarm: widget.alarm,
+                              );
+                            }), (Route route) => false);
+                            timer.cancel();
+                            timer.cancel;
+                            logger.w('15 MIN. Accecpted  CONDITION CHECK');
+                            _incrementCounter();
+                            logger.w(_responseCounter);
+                          }
                           // Navigator.pushAndRemoveUntil(context,
                           //     MaterialPageRoute(builder: (context) {
                           //   return AlarmSecondScreen(

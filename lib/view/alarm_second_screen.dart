@@ -71,16 +71,16 @@ class _AlarmSecondScreenState extends State<AlarmSecondScreen>
     print("available inputs  $_availableInputs");
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.detached:
-        _dismissAlarm();
-        break;
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   switch (state) {
+  //     case AppLifecycleState.detached:
+  //       _dismissAlarm();
+  //       break;
 
-      default:
-    }
-  }
+  //     default:
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -258,7 +258,7 @@ class _AlarmSecondScreenState extends State<AlarmSecondScreen>
                         child: Center(
                           child: IconButton(
                             onPressed: () {
-                              _dismissAlarm();
+                              // _dismissAlarm();
                               SystemNavigator.pop();
                             },
                             icon: const Icon(

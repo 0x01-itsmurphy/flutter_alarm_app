@@ -15,20 +15,41 @@ class PermissionRequestScreen extends StatelessWidget {
     return Consumer<PermissionProvider>(
       builder: (context, provider, _) {
         if (provider.isGrantedAll()) {
-          return child;
+          // if (provider.isStorageGranted()) {
+          if (provider.isIgnoreBatteryGranted()) {
+            return child;
+          }
+          // }
         }
         return Scaffold(
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Please allow permission to trigger the alarm.'),
+                const Text(
+                    'Please allow all the permission to trigger the alarm.'),
+                Text('permission ${provider.isGrantedAll()}'),
+                Text('permission ${provider.isIgnoreBatteryGranted()}'),
+                // Text('permission ${provider.isStorageGranted()}'),
                 TextButton(
-                  onPressed: provider.requestSystemAlertWindow,
-                  child: provider.requestSystemAlertWindow == true
-                      ? Text('Setting Done')
-                      : Text('Setting up'),
-                ),
+                    onPressed: provider.requestSystemAlertWindow,
+                    child: Text(provider.isGrantedAll() == true
+                        ? 'System Alert Granted'
+                        : 'Grant System Alert')),
+                TextButton(
+                    onPressed: provider.ignoreBatteryOptimizations,
+                    child: Text(
+                      provider.isIgnoreBatteryGranted() == true
+                          ? 'Ignore Battery Granted'
+                          : "Grant Ignore Battery",
+                    )),
+                // TextButton(
+                //     onPressed: provider.storagePermission,
+                //     child: Text(
+                //       provider.isStorageGranted() == true
+                //           ? 'Storage Granted'
+                //           : 'Grant Storage',
+                //     )),
               ],
             ),
           ),
