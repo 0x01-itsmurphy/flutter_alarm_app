@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_list_provider.dart';
 import 'package:flutter_alarm_app/service/alarm_scheduler.dart';
+import 'package:flutter_alarm_app/view/SettingsScreen/wakeup_settings_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -64,7 +65,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Alarm App')),
+      appBar: AppBar(
+        title: const Text('Flutter Alarm App'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const WakeupSettingsPage()));
+            },
+            icon: const Icon(
+              Icons.settings,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _createAlarm(context, context.read<AlarmListProvider>());

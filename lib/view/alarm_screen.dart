@@ -7,17 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_state.dart';
-import 'package:flutter_alarm_app/provider/response_counter.dart';
 import 'package:flutter_alarm_app/service/alarm_scheduler.dart';
-import 'package:flutter_alarm_app/view/AlarmScreen/first_call_screen.dart';
 import 'package:flutter_alarm_app/view/alarm_second_screen.dart';
+import 'package:flutter_audio_output/flutter_audio_output.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:logger/logger.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:logger/logger.dart';
-import 'package:flutter_audio_output/flutter_audio_output.dart';
 
 class AlarmScreen extends StatefulWidget {
   const AlarmScreen({Key? key, required this.alarm}) : super(key: key);
@@ -62,8 +60,8 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
   void _clearCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.clear();
-      prefs.remove("counter");
+      // prefs.remove("counter");
+      prefs.setInt('counter', _responseCounter);
     });
   }
 
