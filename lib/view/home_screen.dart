@@ -1,9 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_list_provider.dart';
+import 'package:flutter_alarm_app/provider/switch_provider.dart';
 import 'package:flutter_alarm_app/service/alarm_scheduler.dart';
 import 'package:flutter_alarm_app/view/SettingsScreen/wakeup_settings_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -55,6 +59,8 @@ class HomeScreen extends StatelessWidget {
     );
     if (time == null) return;
 
+    print(time);
+
     final newAlarm = alarm.copyWith(hour: time.hour, minute: time.minute);
 
     alarmList.replace(alarm, newAlarm);
@@ -64,6 +70,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var switchProvider = Provider.of<SwitchProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Alarm App'),
@@ -98,7 +106,9 @@ class HomeScreen extends StatelessWidget {
                     return _AlarmCard(
                       alarm: alarm,
                       onTapSwitch: (enabled) {
-                        _switchAlarm(alarmList, alarm, enabled);
+                        // _switchAlarm(alarmList, alarm, enabled);
+                        switchProvider.switchAlarm(alarmList, alarm, enabled);
+                        print("ALARM SWITCH $enabled");
                       },
                       onTapCard: () {
                         _handleCardTap(alarmList, alarm, context);

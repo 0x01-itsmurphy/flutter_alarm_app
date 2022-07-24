@@ -15,11 +15,9 @@ class PermissionRequestScreen extends StatelessWidget {
     return Consumer<PermissionProvider>(
       builder: (context, provider, _) {
         if (provider.isGrantedAll()) {
-          // if (provider.isStorageGranted()) {
           if (provider.isIgnoreBatteryGranted()) {
             return child;
           }
-          // }
         }
         return Scaffold(
           body: Center(
@@ -43,13 +41,6 @@ class PermissionRequestScreen extends StatelessWidget {
                           ? 'Ignore Battery Granted'
                           : "Grant Ignore Battery",
                     )),
-                // TextButton(
-                //     onPressed: provider.storagePermission,
-                //     child: Text(
-                //       provider.isStorageGranted() == true
-                //           ? 'Storage Granted'
-                //           : 'Grant Storage',
-                //     )),
               ],
             ),
           ),
