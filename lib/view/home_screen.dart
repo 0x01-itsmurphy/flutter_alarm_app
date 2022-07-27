@@ -9,9 +9,14 @@ import 'package:flutter_alarm_app/view/SettingsScreen/wakeup_settings_screen.dar
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   void _createAlarm(
       BuildContext context, AlarmListProvider alarmListProvider) async {
     final time = await showTimePicker(
@@ -29,23 +34,6 @@ class HomeScreen extends StatelessWidget {
 
     alarmListProvider.add(alarm);
     await AlarmScheduler.scheduleRepeatable(alarm);
-  }
-
-  void _switchAlarm(
-    AlarmListProvider alarmListProvider,
-    Alarm alarm,
-    bool enabled,
-  ) async {
-    final newAlarm = alarm.copyWith(enabled: enabled);
-    alarmListProvider.replace(
-      alarm,
-      newAlarm,
-    );
-    if (enabled) {
-      await AlarmScheduler.scheduleRepeatable(newAlarm);
-    } else {
-      await AlarmScheduler.cancelRepeatable(newAlarm);
-    }
   }
 
   void _handleCardTap(
@@ -68,6 +56,7 @@ class HomeScreen extends StatelessWidget {
     if (newAlarm.enabled) await AlarmScheduler.scheduleRepeatable(newAlarm);
   }
 
+  int timerValue = 15;
   @override
   Widget build(BuildContext context) {
     var switchProvider = Provider.of<SwitchProvider>(context, listen: false);
@@ -118,6 +107,17 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+            Text(timerValue.toString()),
+            TextButton(
+                onPressed: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  setState(() {
+                    timerValue = prefs.getInt('intValue')!;
+                  });
+                  print(timerValue);
+                },
+                child: Text("get timer"))
           ],
         ),
       ),

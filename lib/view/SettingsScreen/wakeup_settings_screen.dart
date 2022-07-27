@@ -4,6 +4,7 @@ import 'package:flutter_alarm_app/model/alarm.dart';
 import 'package:flutter_alarm_app/provider/alarm_list_provider.dart';
 import 'package:flutter_alarm_app/provider/switch_provider.dart';
 import 'package:flutter_alarm_app/service/alarm_scheduler.dart';
+import 'package:flutter_alarm_app/view/SettingsScreen/Widgets/change_confirm_call_time.dart';
 import 'package:flutter_alarm_app/view/SettingsScreen/Widgets/change_wakeup_time_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,7 +80,7 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
         print(alarm.enabled);
         print(alarmList.length);
         print("${alarm.hour} : ${alarm.minute}");
-        
+
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -205,7 +206,12 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
                 subtitle: const Text("Change Confirmation Call Time after call",
                     style: TextStyle(fontSize: 12.0)),
                 onTap: () {
-                  // RadioSettingsTile
+                  showDialog(
+                    context: context,
+                    builder: (builder) {
+                      return const ChangeConfirmCallTime();
+                    },
+                  );
                 },
               ),
             ],

@@ -1,6 +1,9 @@
+// ignore_for_file: avoid_print
+
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_alarm_app/model/alarm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmScheduler {
   static Future<void> scheduleRepeatable(Alarm alarm) async {
@@ -80,8 +83,13 @@ class AlarmScheduler {
   }
 
   static Future<void> _fifteenMinShot(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int timerValue = prefs.getInt('intValue') ?? 15;
+
+    print("15 MIN. SHOT TIMER ===>>> $timerValue");
+
     await AndroidAlarmManager.oneShot(
-      const Duration(minutes: 15), // MAKE CONSTRUCTOR FOR TIME
+      Duration(minutes: timerValue), // MAKE CONSTRUCTOR FOR TIME
       id,
       _emptyCallback,
       exact: true,

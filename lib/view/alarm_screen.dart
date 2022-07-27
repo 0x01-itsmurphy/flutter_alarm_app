@@ -61,7 +61,7 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       // prefs.remove("counter");
-      prefs.setInt('counter', _responseCounter);
+      prefs.setInt('counter', 0);
     });
   }
 
