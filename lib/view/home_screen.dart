@@ -77,12 +77,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _createAlarm(context, context.read<AlarmListProvider>());
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: Provider.of<AlarmListProvider>(context).length == 1
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                _createAlarm(context, context.read<AlarmListProvider>());
+              },
+              child: const Icon(Icons.add),
+            ),
       body: Center(
         child: Column(
           children: [
