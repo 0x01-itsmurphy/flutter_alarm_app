@@ -295,36 +295,44 @@ class _AlarmScreenState extends State<AlarmScreen> with WidgetsBindingObserver {
                       InkWell(
                         onTap: () async {
                           // //! NAVIGATE TO SECOND SCREEN
-                          if (_responseCounter >= 2) {
-                            _dismissAlarm();
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(builder: (context) {
-                              return AlarmSecondScreen(
-                                alarm: widget.alarm,
-                              );
-                            }), (Route route) => false);
-                            logger.w('2nd TIME Accecpted COUNTER');
-                            _clearCounter();
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          bool? isConfirmOn = prefs.getBool('isConfirmOn');
+
+                          if (isConfirmOn == true) {
+                            logger.w("CONFIRMATION CHECK IS TRUE");
+                            if (_responseCounter >= 2) {
+                              _dismissAlarm();
+                              _clearCounter();
+                              logger.w('2nd TIME Accecpted COUNTER');
+                              if (!mounted) return;
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return AlarmSecondScreen(
+                                  alarm: widget.alarm,
+                                );
+                              }), (Route route) => false);
+                            } else {
+                              _fifteenMinShot();
+                              timer.cancel();
+                              timer.cancel;
+                              logger.w('15 MIN. Accecpted  CONDITION CHECK');
+                              _incrementCounter();
+                              logger.w(_responseCounter);
+                              if (!mounted) return;
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return AlarmSecondScreen(
+                                  alarm: widget.alarm,
+                                );
+                              }), (Route route) => false);
+                            }
                           } else {
-                            _fifteenMinShot();
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(builder: (context) {
-                              return AlarmSecondScreen(
-                                alarm: widget.alarm,
-                              );
-                            }), (Route route) => false);
-                            timer.cancel();
-                            timer.cancel;
-                            logger.w('15 MIN. Accecpted  CONDITION CHECK');
-                            _incrementCounter();
-                            logger.w(_responseCounter);
+                            logger.w("APP CLOSED");
+                            _dismissAlarm();
+                            _clearCounter();
+                            SystemNavigator.pop();
                           }
-                          // Navigator.pushAndRemoveUntil(context,
-                          //     MaterialPageRoute(builder: (context) {
-                          //   return AlarmSecondScreen(
-                          //     alarm: widget.alarm,
-                          //   );
-                          // }), (Route route) => false);
                         },
                         child: Container(
                           width: 60,

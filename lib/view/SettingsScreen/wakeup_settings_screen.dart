@@ -42,7 +42,7 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("isWakeupOn", _isWakeupOn);
     await prefs.setBool("isBoldOn", _isWakeUpForeverOn);
-    await prefs.setBool("isNightModeOn", _isConfirmOn);
+    await prefs.setBool("isConfirmOn", _isConfirmOn);
   }
 
   Future<void> hasValues() async {
@@ -71,15 +71,12 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
     return Consumer<AlarmListProvider>(
       builder: (context, alarmList, child) {
         final alarm = alarmList[0];
-        // var alarm;
-
-        // for (var i = 0; i < alarmList.length; i++) {
-        //   alarm = alarmList[i];
-        // }
 
         print(alarm.enabled);
         print(alarmList.length);
         print("${alarm.hour} : ${alarm.minute}");
+
+        print("IS CONFIRM $_isConfirmOn");
 
         return Scaffold(
           appBar: AppBar(
@@ -151,15 +148,14 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
                   "No Amritvela Time Wakeup Call",
                   style: TextStyle(fontSize: 12.0),
                 ),
-                value: alarm.enabled,
+                value: !alarm.enabled,
                 onChanged: (bool value) {
                   setState(() {
-                    _isWakeUpForeverOn = value;
+                    _isWakeUpForeverOn = !value;
                     setValues();
-                    // TODO 2 Insert A Ternary Operator Here
 
                     switchProvider.switchAlarm(
-                        alarmList, alarm, value); //! DO-NOT Remove
+                        alarmList, alarm, !value); //! DO-NOT Remove
                   });
                 },
               ),
@@ -194,7 +190,6 @@ class _WakeupSettingsPageState extends State<WakeupSettingsPage> {
                   setState(() {
                     _isConfirmOn = value;
                     setValues();
-                    // TODO 3 Insert A Ternary Operator Here
                   });
                 },
               ),
